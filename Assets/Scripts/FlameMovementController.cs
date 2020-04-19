@@ -28,7 +28,7 @@ public class FlameMovementController : MonoBehaviour
     private float colliderSizeY;
     private bool platformDrop = false;
     private float platformDropCooldown = 0.2f;
-    private float rayLength = 0.1f;
+    private float rayLength = 0.2f;
 
     private Stopwatch stopwatch;
     private float jumpAvailableDelay = 0.1f;
@@ -99,7 +99,7 @@ public class FlameMovementController : MonoBehaviour
         }
 
         // Handle platform dropdown
-        if (!platformDrop && verticalMovementRaw < 0 && (currentIsGroundedTimer > 0) && canJump)
+        if (!platformDrop && verticalMovementRaw < 0 && isOnGround && canJump)
         {
             StartCoroutine(DropThroughPlatform());
         }
@@ -126,8 +126,8 @@ public class FlameMovementController : MonoBehaviour
 
         // Check collisions
         CollisionDetectionWalls();
-        CollisionDetectionCeiling();
         CollisionDetectionDown(!platformDrop);
+        CollisionDetectionCeiling();
     }
 
     private IEnumerator DropThroughPlatform()
