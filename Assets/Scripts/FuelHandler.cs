@@ -36,7 +36,7 @@ public class FuelHandler : MonoBehaviour
                 currentKickDistance += kickDistance * kickSpeed * Time.deltaTime;
             }
 
-            if(currentKickDistance > -0.01 && currentKickDistance < 0.01)
+            if(currentKickDistance > -0.1 && currentKickDistance < 0.1)
             {
                 currentKickDistance = 0;
             }
@@ -91,6 +91,6 @@ public class FuelHandler : MonoBehaviour
 
     public bool IsKicking()
     {
-        return currentKickDistance != 0 || (currentKickDistance < -0.01 || currentKickDistance > 0.01);
+        return currentKickDistance != 0 ;
     }
 }
