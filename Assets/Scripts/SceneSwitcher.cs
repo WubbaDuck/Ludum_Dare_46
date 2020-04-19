@@ -29,7 +29,6 @@ public class SceneSwitcher : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        Debug.Log(LayerMask.GetMask(LayerMask.LayerToName(col.gameObject.layer)));
         if(LayerMask.GetMask(LayerMask.LayerToName(col.gameObject.layer)) == winGateMask.value)
         {
             SceneManager.LoadScene(winSceneName);

@@ -30,10 +30,15 @@ public class FlameMovementController : MonoBehaviour
 
     private RaycastHit2D lastRayHitResult = new RaycastHit2D();
 
+    private FuelHandler fuelHandler;
+    private FlameAudioHandler flameAudioHandler;
+
     void Start()
     {
         colliderSizeX = GetComponent<CapsuleCollider2D>().size.x / 2f;
         colliderSizeY = GetComponent<CapsuleCollider2D>().size.y / 2f;
+        fuelHandler = GetComponent<FuelHandler>();
+        flameAudioHandler = GetComponent<FlameAudioHandler>();
     }
 
     void Update()
@@ -43,7 +48,7 @@ public class FlameMovementController : MonoBehaviour
         horizontalMovementRaw = Input.GetAxisRaw("Horizontal"); // Get the horizontal movement
         verticalMovementRaw = Input.GetAxisRaw("Vertical"); // Get the vertial movement
 
-        if (horizontalMovementRaw != 0) // Player is inputing movement commands
+        if (horizontalMovementRaw != 0 && !fuelHandler.IsKicking()) // Player is inputing movement commands
         {
             if (velocity.x == 0 || Mathf.Sign(horizontalMovementRaw) == Mathf.Sign(velocity.x))
             {
@@ -112,30 +117,6 @@ public class FlameMovementController : MonoBehaviour
         CollisionDetectionCeiling();
     }
 
-    // void FixedUpdate()
-    // {
-    //     transform.position += velocity * Time.fixedDeltaTime; // Move the charactedir, ColliderSize, maskr;
-
-    //     // Mmmm Gravity
-    //     if (!isOnGround)
-    //     {
-    //         if (jumpCanceled)
-    //         {
-    //             velocity.y += gravity * Time.fixedDeltaTime * jumpCanceledGravityMultiplier;
-
-    //         }
-    //         else
-    //         {
-    //             velocity.y += gravity * Time.fixedDeltaTime;
-    //         }
-    //     }
-
-    //     // Check collisions
-    //     CollisionDetectionDown(!platformDrop);
-    //     CollisionDetectionWalls();
-    //     CollisionDetectionCeiling();
-    // }
-
     private IEnumerator DropThroughPlatform()
     {
         platformDrop = true;
@@ -158,6 +139,7 @@ public class FlameMovementController : MonoBehaviour
         {
             jumping = true;
             jumpCanceled = false;
+            flameAudioHandler.PlaySound_Jump();
             return true;
         }
 
