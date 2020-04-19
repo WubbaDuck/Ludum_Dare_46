@@ -8,7 +8,7 @@ public class FuelHandler : MonoBehaviour
     public LayerMask fuelMask;
     public LayerMask damageMask;
 
-    private float fuelLevel = 25f;
+    private float fuelLevel = 15f;
     
     void Start()
     {
