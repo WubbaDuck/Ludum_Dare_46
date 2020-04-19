@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 public class FlameMovementController : MonoBehaviour
@@ -28,6 +29,14 @@ public class FlameMovementController : MonoBehaviour
     private float platformDropCooldown = 0.2f;
     private float rayLength = 0.1f;
 
+    private Stopwatch stopwatch;
+    private float jumpAvailableDelay = 0.1f;
+
+    private float jumpButtonTimerWindow = 0.2f;
+    private float isGroundedTimerWindow = 0.15f;
+    private float currentJumpButtonTimer = 0f;
+    private float currentIsGroundedTimer = 0f;
+
     private RaycastHit2D lastRayHitResult = new RaycastHit2D();
 
     private FuelHandler fuelHandler;
@@ -39,11 +48,14 @@ public class FlameMovementController : MonoBehaviour
         colliderSizeY = GetComponent<CapsuleCollider2D>().size.y / 2f;
         fuelHandler = GetComponent<FuelHandler>();
         flameAudioHandler = GetComponent<FlameAudioHandler>();
+        stopwatch = new Stopwatch();
     }
 
     void Update()
     {
         bool canJump = false;
+        currentJumpButtonTimer -= Time.deltaTime;
+        currentIsGroundedTimer -= Time.deltaTime;
 
         horizontalMovementRaw = Input.GetAxisRaw("Horizontal"); // Get the horizontal movement
         verticalMovementRaw = Input.GetAxisRaw("Vertical"); // Get the vertial movement
@@ -73,7 +85,7 @@ public class FlameMovementController : MonoBehaviour
         // Jumping
         canJump = GetJumpAvailability();
 
-        if (verticalMovementRaw >= 0 && isOnGround && canJump)
+        if (verticalMovementRaw >= 0 && (currentIsGroundedTimer > 0) && canJump)
         {
             isOnGround = false;
             velocity.y = jumpStrength;
@@ -86,7 +98,7 @@ public class FlameMovementController : MonoBehaviour
         }
 
         // Handle platform dropdown
-        if (!platformDrop && verticalMovementRaw < 0 && isOnGround && canJump)
+        if (!platformDrop && verticalMovementRaw < 0 && (currentIsGroundedTimer > 0) && canJump)
         {
             StartCoroutine(DropThroughPlatform());
         }
@@ -129,13 +141,27 @@ public class FlameMovementController : MonoBehaviour
     {
         bool buttonDown = Input.GetButton("Jump");
 
-        if (jumping && !buttonDown)
+        if (buttonDown)
+        {
+            currentJumpButtonTimer = jumpButtonTimerWindow;
+        }
+        else
+        {
+            currentJumpButtonTimer = 0;
+        }
+
+        if (isOnGround)
+        {
+            currentIsGroundedTimer = isGroundedTimerWindow;
+        }
+
+        if (jumping && !(currentJumpButtonTimer > 0))
         {
             jumping = false;
             jumpCanceled = true;
         }
 
-        if (isOnGround && buttonDown && !jumping)
+        if ((currentJumpButtonTimer > 0) && (currentIsGroundedTimer > 0) && !jumping)
         {
             jumping = true;
             jumpCanceled = false;
@@ -149,7 +175,7 @@ public class FlameMovementController : MonoBehaviour
     private bool Raycast(Vector2 origin, Vector2 direction, float diststance, LayerMask mask)
     {
         lastRayHitResult = Physics2D.Raycast(origin, direction, diststance, mask);
-        Debug.DrawRay(origin, direction, Color.red, Time.deltaTime);
+        UnityEngine.Debug.DrawRay(origin, direction, Color.red, Time.deltaTime);
 
         if (lastRayHitResult.collider != null)
         {
@@ -187,6 +213,7 @@ public class FlameMovementController : MonoBehaviour
         else
         {
             isOnGround = false;
+            stopwatch.Start();
         }
     }
 

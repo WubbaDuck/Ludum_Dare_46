@@ -11,11 +11,13 @@ public class SceneSwitcher : MonoBehaviour
     public LayerMask winGateMask;
 
     private UnityEngine.Experimental.Rendering.Universal.Light2D flameLight;
+    private FuelHandler fuelHandler;
 
     // Start is called before the first frame update
     void Start()
     {
         flameLight = flame.GetComponent<UnityEngine.Experimental.Rendering.Universal.Light2D>();
+        fuelHandler = GetComponent<FuelHandler>();
     }
 
     // Update is called once per frame
@@ -38,6 +40,10 @@ public class SceneSwitcher : MonoBehaviour
     private IEnumerator BurnOut()
     {
         yield return new WaitForSeconds(3);
-        SceneManager.LoadScene(loseSceneName);
+        
+        if(fuelHandler.GetCurrentFuelLevel() <= 0)
+        {
+            SceneManager.LoadScene(loseSceneName);
+        }
     }
 }
