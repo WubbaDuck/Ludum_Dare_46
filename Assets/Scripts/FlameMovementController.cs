@@ -32,8 +32,8 @@ public class FlameMovementController : MonoBehaviour
 
     void Start()
     {
-        colliderSizeX = GetComponent<BoxCollider2D>().size.x / 2f;
-        colliderSizeY = GetComponent<BoxCollider2D>().size.y / 2f;
+        colliderSizeX = GetComponent<CapsuleCollider2D>().size.x / 2f;
+        colliderSizeY = GetComponent<CapsuleCollider2D>().size.y / 2f;
     }
 
     void Update()
