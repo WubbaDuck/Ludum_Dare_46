@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MainMenuFlameFlicker : MonoBehaviour
 {
@@ -9,12 +10,24 @@ public class MainMenuFlameFlicker : MonoBehaviour
     private bool flickerTick = false;
     private float baseIntensity;
     private FuelHandler fuelHandler;
-
+    private float fadeRate = 0f;
+    
     void Start()
     {
         flameLight = GetComponent<UnityEngine.Experimental.Rendering.Universal.Light2D>();
         baseIntensity = flameLight.intensity;
         InvokeRepeating("Flicker", 0, flickerRate);
+    }
+
+    void Update()
+    {
+        flameLight.pointLightOuterRadius -= fadeRate * Time.deltaTime;
+        
+        if(flameLight.pointLightOuterRadius <= 0)
+        {
+            // Load next scene
+            SceneManager.LoadScene("Game");
+        }
     }
 
     void Flicker()
@@ -33,8 +46,8 @@ public class MainMenuFlameFlicker : MonoBehaviour
         }
     }
 
-    void UpdateOuterRadius()
+    public void FadeOut()
     {
-        // flameLight.pointLightOuterRadius = fuelHandler.GetCurrentFuelLevel()/2;
+        fadeRate = 4f;
     }
 }
