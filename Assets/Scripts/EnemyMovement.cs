@@ -6,6 +6,7 @@ public class EnemyMovement : MonoBehaviour
 {
     public float movementSpeed = 3f;
     public Transform[] patrolPoints;
+    public bool patrolling = true;
     private bool isBacktracking = false;
     private int currentPointIndex = 0;
 
@@ -13,28 +14,42 @@ public class EnemyMovement : MonoBehaviour
     void Update()
     {
         float step = movementSpeed * Time.deltaTime;
-        transform.position = Vector3.MoveTowards(transform.position,patrolPoints[currentPointIndex].position, step);
+        transform.position = Vector3.MoveTowards(transform.position, patrolPoints[currentPointIndex].position, step);
 
-        if (transform.position == patrolPoints[currentPointIndex].position)
+        if (patrolling)
         {
-            if (isBacktracking)
+            if (transform.position == patrolPoints[currentPointIndex].position)
             {
-                currentPointIndex--;
+                if (isBacktracking)
+                {
+                    currentPointIndex--;
+                }
+                else
+                {
+                    currentPointIndex++;
+                }
             }
-            else
+
+            if (currentPointIndex >= patrolPoints.Length - 1)
+            {
+                isBacktracking = true;
+            }
+            else if (currentPointIndex <= 0)
+            {
+                isBacktracking = false;
+            }
+        }
+        else
+        {
+            if (transform.position == patrolPoints[currentPointIndex].position)
             {
                 currentPointIndex++;
             }
-        }
 
-        if (currentPointIndex >= patrolPoints.Length - 1)
-        {
-            isBacktracking = true;
+            if (currentPointIndex >= patrolPoints.Length)
+            {
+                currentPointIndex = 0;
+            }
         }
-        else if (currentPointIndex <= 0)
-        {
-            isBacktracking = false;
-        }
-
     }
 }
