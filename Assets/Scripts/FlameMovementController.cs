@@ -6,6 +6,7 @@ using UnityEngine;
 public class FlameMovementController : MonoBehaviour
 {
     public float maxMoveSpeed = 5f;
+    public float maxVerticalSpeed = 25f;
     public float acceleration = 10f;
     public float slideAcceleration = 20f;
     public float gravity = -9.81f;
@@ -105,7 +106,7 @@ public class FlameMovementController : MonoBehaviour
 
         // Clamp the velocity
         velocity.x = Mathf.Clamp(velocity.x, -maxMoveSpeed, maxMoveSpeed);
-        // velocity.y = Mathf.Clamp(velocity.y, -maxMoveSpeed, maxMoveSpeed);
+        velocity.y = Mathf.Clamp(velocity.y, -maxVerticalSpeed, maxVerticalSpeed);
 
         transform.position += velocity * Time.deltaTime; // Move the charactedir, ColliderSize, maskr;
 
@@ -188,7 +189,7 @@ public class FlameMovementController : MonoBehaviour
     private void CollisionDetectionDown(bool checkAll = true)
     {
         bool collisionDetected = false;
-        bool wallCollisionDetected = false;
+
         Vector2 origin = new Vector2(transform.position.x, transform.position.y - colliderSizeY + rayLength);;
 
         if (velocity.y <= 0)

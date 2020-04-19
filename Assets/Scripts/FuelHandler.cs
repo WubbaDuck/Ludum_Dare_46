@@ -15,31 +15,50 @@ public class FuelHandler : MonoBehaviour
     private float currentKickDistance = 0f;
     private float kickSpeed = 10f;
 
+    private RaycastHit2D lastRayHitResult = new RaycastHit2D();
+    private bool collisionDetectedRight = false;
+    private bool collisionDetectedLeft = false;
+    private float colliderSizeX;
+    private float rayLength = 0.3f;
+    public LayerMask wallsMask;
+
     void Start()
     {
         flameAudioHandler = GetComponent<FlameAudioHandler>();
+        colliderSizeX = GetComponent<CapsuleCollider2D>().size.x / 2f;
         InvokeRepeating("BurnFuel", secondsPerFuelUsed * 3f, secondsPerFuelUsed);
     }
 
     void Update()
     {
-        if (Mathf.Abs(currentKickDistance) > 0f)
-        {
-            if (currentKickDistance > 0)
-            {
-                transform.position = new Vector2(transform.position.x - kickDistance * kickSpeed * Time.deltaTime, transform.position.y);
-                currentKickDistance -= kickDistance * kickSpeed * Time.deltaTime;
-            }
-            else if (currentKickDistance < 0)
-            {
-                transform.position = new Vector2(transform.position.x + kickDistance * kickSpeed * Time.deltaTime, transform.position.y);
-                currentKickDistance += kickDistance * kickSpeed * Time.deltaTime;
-            }
+        Vector2 origin = new Vector2(transform.position.x - colliderSizeX + rayLength, transform.position.y);
+        collisionDetectedRight = Raycast(origin, transform.right, rayLength, (wallsMask));
+        collisionDetectedLeft = Raycast(origin, -transform.right, rayLength, (wallsMask));
 
-            if(currentKickDistance > -0.1 && currentKickDistance < 0.1)
+        if (!collisionDetectedLeft && !collisionDetectedRight)
+        {
+            if (Mathf.Abs(currentKickDistance) > 0f)
             {
-                currentKickDistance = 0;
+                if (currentKickDistance > 0)
+                {
+                    transform.position = new Vector2(transform.position.x - kickDistance * kickSpeed * Time.deltaTime, transform.position.y);
+                    currentKickDistance -= kickDistance * kickSpeed * Time.deltaTime;
+                }
+                else if (currentKickDistance < 0)
+                {
+                    transform.position = new Vector2(transform.position.x + kickDistance * kickSpeed * Time.deltaTime, transform.position.y);
+                    currentKickDistance += kickDistance * kickSpeed * Time.deltaTime;
+                }
+
+                if (currentKickDistance > -0.1 && currentKickDistance < 0.1)
+                {
+                    currentKickDistance = 0;
+                }
             }
+        }
+        else
+        {
+            currentKickDistance = 0;
         }
     }
 
@@ -91,6 +110,19 @@ public class FuelHandler : MonoBehaviour
 
     public bool IsKicking()
     {
-        return currentKickDistance != 0 ;
+        return currentKickDistance != 0;
+    }
+
+    private bool Raycast(Vector2 origin, Vector2 direction, float diststance, LayerMask mask)
+    {
+        lastRayHitResult = Physics2D.Raycast(origin, direction, diststance, mask);
+        UnityEngine.Debug.DrawRay(origin, direction, Color.red, Time.deltaTime);
+
+        if (lastRayHitResult.collider != null)
+        {
+            return true;
+        }
+
+        return false;
     }
 }
