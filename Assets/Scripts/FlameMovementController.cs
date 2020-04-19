@@ -124,9 +124,9 @@ public class FlameMovementController : MonoBehaviour
         }
 
         // Check collisions
-        CollisionDetectionDown(!platformDrop);
         CollisionDetectionWalls();
         CollisionDetectionCeiling();
+        CollisionDetectionDown(!platformDrop);
     }
 
     private IEnumerator DropThroughPlatform()
@@ -188,20 +188,19 @@ public class FlameMovementController : MonoBehaviour
     private void CollisionDetectionDown(bool checkAll = true)
     {
         bool collisionDetected = false;
+        bool wallCollisionDetected = false;
+        Vector2 origin = new Vector2(transform.position.x, transform.position.y - colliderSizeY + rayLength);;
 
         if (velocity.y <= 0)
         {
             if (checkAll)
             {
-                Vector2 origin = new Vector2(transform.position.x, transform.position.y - colliderSizeY + rayLength);
                 collisionDetected = Raycast(origin, -transform.up, rayLength, (wallsMask | ceilingsMask | platformsMask));
             }
             else
             {
-                Vector2 origin = new Vector2(transform.position.x, transform.position.y - colliderSizeY + rayLength);
                 collisionDetected = Raycast(origin, -transform.up, rayLength, (wallsMask | ceilingsMask));
             }
-
         }
 
         if (collisionDetected)
@@ -243,6 +242,7 @@ public class FlameMovementController : MonoBehaviour
                 velocity.x = 0;
             }
         }
+        UnityEngine.Debug.Log(collisionDetected);
     }
 
     private void CollisionDetectionCeiling()
