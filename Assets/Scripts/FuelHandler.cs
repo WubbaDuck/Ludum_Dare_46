@@ -33,7 +33,7 @@ public class FuelHandler : MonoBehaviour
         }
         else if(LayerMask.GetMask(LayerMask.LayerToName(col.gameObject.layer)) == damageMask.value)
         {
-            fuelLevel -= col.gameObject.GetComponent<FuelPickup>().fuelAmount;
+            fuelLevel -= col.gameObject.GetComponent<DamagePickup>().damageAmount;
             Destroy(col.gameObject);
         }
         Debug.Log(fuelLevel);

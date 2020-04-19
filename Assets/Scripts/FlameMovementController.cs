@@ -25,7 +25,8 @@ public class FlameMovementController : MonoBehaviour
     private float colliderSizeX;
     private float colliderSizeY;
     private bool platformDrop = false;
-    private float platformDropCooldown = 0.3f;
+    private float platformDropCooldown = 0.2f;
+    private float rayLength = 0.1f;
 
     private RaycastHit2D lastRayHitResult = new RaycastHit2D();
 
@@ -87,7 +88,7 @@ public class FlameMovementController : MonoBehaviour
 
         // Clamp the velocity
         velocity.x = Mathf.Clamp(velocity.x, -maxMoveSpeed, maxMoveSpeed);
-        velocity.y = Mathf.Clamp(velocity.y, -maxMoveSpeed, maxMoveSpeed);
+        // velocity.y = Mathf.Clamp(velocity.y, -maxMoveSpeed, maxMoveSpeed);
     }
 
     void FixedUpdate()
@@ -125,7 +126,7 @@ public class FlameMovementController : MonoBehaviour
     private bool GetJumpAvailability()
     {
         bool buttonDown = Input.GetButton("Jump");
-
+        
         if (jumping && !buttonDown)
         {
             jumping = false;
@@ -135,16 +136,18 @@ public class FlameMovementController : MonoBehaviour
         if (isOnGround && buttonDown && !jumping)
         {
             jumping = true;
+            jumpCanceled = false;
             return true;
         }
 
         return false;
     }
 
-    private bool Raycast(Vector2 direction, float diststance, LayerMask mask)
+    private bool Raycast(Vector2 origin, Vector2 direction, float diststance, LayerMask mask)
     {
-        lastRayHitResult = Physics2D.Raycast(transform.position, direction, diststance, mask);
-        // Debug.DrawRay(transform.position, direction, Color.red, Time.deltaTime);
+        lastRayHitResult = Physics2D.Raycast(origin, direction, diststance, mask);
+        Debug.DrawRay(origin, direction, Color.red, Time.deltaTime);
+        
         if (lastRayHitResult.collider != null)
         {
             return true;
@@ -161,11 +164,13 @@ public class FlameMovementController : MonoBehaviour
         {
             if (checkAll)
             {
-                collisionDetected = Raycast(-transform.up, colliderSizeY, (wallsMask | ceilingsMask | platformsMask));
+                Vector2 origin = new Vector2(transform.position.x, transform.position.y - colliderSizeY + rayLength);
+                collisionDetected = Raycast(origin,  -transform.up, rayLength, (wallsMask | ceilingsMask | platformsMask));
             }
             else
             {
-                collisionDetected = Raycast(-transform.up, colliderSizeY, (wallsMask | ceilingsMask));
+                Vector2 origin = new Vector2(transform.position.x, transform.position.y - colliderSizeY + rayLength);
+                collisionDetected = Raycast(origin, -transform.up, rayLength, (wallsMask | ceilingsMask));
             }
 
         }
@@ -188,7 +193,8 @@ public class FlameMovementController : MonoBehaviour
 
         if (velocity.x < 0) // Check left if we are moving left
         {
-            collisionDetected = Raycast(-transform.right, colliderSizeX, (wallsMask));
+            Vector2 origin = new Vector2(transform.position.x - colliderSizeX + rayLength, transform.position.y);
+            collisionDetected = Raycast(origin, -transform.right, rayLength, (wallsMask));
 
             if (collisionDetected)
             {
@@ -198,7 +204,8 @@ public class FlameMovementController : MonoBehaviour
         }
         else if (velocity.x > 0) // Check right if we are moving right
         {
-            collisionDetected = Raycast(transform.right, colliderSizeX, (wallsMask));
+            Vector2 origin = new Vector2(transform.position.x + colliderSizeX - rayLength, transform.position.y);
+            collisionDetected = Raycast(origin, transform.right, rayLength, (wallsMask));
 
             if (collisionDetected)
             {
@@ -214,7 +221,8 @@ public class FlameMovementController : MonoBehaviour
 
         if (velocity.y >= 0)
         {
-            collisionDetected = Raycast(transform.up, colliderSizeY, (ceilingsMask));
+            Vector2 origin = new Vector2(transform.position.x, transform.position.y + colliderSizeY - rayLength);
+            collisionDetected = Raycast(origin, transform.up, rayLength, (ceilingsMask));
         }
 
         if (collisionDetected)
