@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenuFlameFlicker : MonoBehaviour
+public class MenuFlameFlicker : MonoBehaviour
 {
     public float flickerRate = 0.2f;
+    public string nextSceneName;
     private UnityEngine.Experimental.Rendering.Universal.Light2D flameLight;
     private bool flickerTick = false;
     private float baseIntensity;
@@ -26,7 +27,7 @@ public class MainMenuFlameFlicker : MonoBehaviour
         if(flameLight.pointLightOuterRadius <= 0)
         {
             // Load next scene
-            SceneManager.LoadScene("Game");
+            SceneManager.LoadScene(nextSceneName);
         }
     }
 

@@ -318,10 +318,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 935662834}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9863ca16c5f61d74e804c66dabff7bdf, type: 3}
+  m_Script: {fileID: 11500000, guid: 8532acd1724c27b4187376ba6386c791, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flickerRate: 0.1
+  flickerRate: 0.2
+  nextSceneName: Game
 --- !u!1 &1018295006
 GameObject:
   m_ObjectHideFlags: 0
