@@ -800,7 +800,7 @@ MonoBehaviour:
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
-  m_PointLightOuterRadius: 10.02
+  m_PointLightOuterRadius: 10
   m_PointLightDistance: 3
   m_PointLightQuality: 1
   m_ShapeLightParametricSides: 5
@@ -851,7 +851,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b036a73b75378549ac08ad5184902c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  winSceneName: Win
+  winSceneName: Furnace
   loseSceneName: Lose
   flame: {fileID: 722770193}
   winGateMask:

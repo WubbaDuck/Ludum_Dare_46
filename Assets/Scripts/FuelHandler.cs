@@ -15,15 +15,6 @@ public class FuelHandler : MonoBehaviour
         InvokeRepeating("BurnFuel", secondsPerFuelUsed * 3f, secondsPerFuelUsed);
     }
 
-    void Update()
-    {
-        // Check for burnout
-        if(fuelLevel <= 0)
-        {
-            BurnOut();
-        }
-    }
-
     void OnTriggerEnter2D(Collider2D col)
     {
         if(LayerMask.GetMask(LayerMask.LayerToName(col.gameObject.layer)) == fuelMask.value)
@@ -41,7 +32,10 @@ public class FuelHandler : MonoBehaviour
 
     private void BurnFuel()
     {
-        fuelLevel--;
+        if (fuelLevel > 0)
+        {
+            fuelLevel--;
+        }
         Debug.Log(fuelLevel);
     }
 

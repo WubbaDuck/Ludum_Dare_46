@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -631,7 +631,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Start
+  m_Text: Restart
 --- !u!222 &1106830347
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -799,7 +799,7 @@ GameObject:
   - component: {fileID: 1563834334}
   - component: {fileID: 1563834333}
   m_Layer: 5
-  m_Name: Game Title
+  m_Name: Game Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -855,7 +855,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Fuel Hungry
+  m_Text: You made it to the furnace!
 --- !u!222 &1563834334
 CanvasRenderer:
   m_ObjectHideFlags: 0

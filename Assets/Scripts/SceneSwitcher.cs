@@ -23,7 +23,7 @@ public class SceneSwitcher : MonoBehaviour
     {
         if(flameLight.pointLightOuterRadius <= 0)
         {
-            SceneManager.LoadScene(loseSceneName);
+            StartCoroutine("BurnOut");
         }
     }
 
@@ -34,5 +34,11 @@ public class SceneSwitcher : MonoBehaviour
         {
             SceneManager.LoadScene(winSceneName);
         }
+    }
+
+    private IEnumerator BurnOut()
+    {
+        yield return new WaitForSeconds(3);
+        SceneManager.LoadScene(loseSceneName);
     }
 }

@@ -81,7 +81,7 @@ public class FlameMovementController : MonoBehaviour
         }
 
         // Handle platform dropdown
-        if(!platformDrop && verticalMovementRaw < 0 && isOnGround && canJump)
+        if (!platformDrop && verticalMovementRaw < 0 && isOnGround && canJump)
         {
             StartCoroutine(DropThroughPlatform());
         }
@@ -89,23 +89,20 @@ public class FlameMovementController : MonoBehaviour
         // Clamp the velocity
         velocity.x = Mathf.Clamp(velocity.x, -maxMoveSpeed, maxMoveSpeed);
         // velocity.y = Mathf.Clamp(velocity.y, -maxMoveSpeed, maxMoveSpeed);
-    }
 
-    void FixedUpdate()
-    {
-        transform.position += velocity * Time.fixedDeltaTime; // Move the charactedir, ColliderSize, maskr;
+        transform.position += velocity * Time.deltaTime; // Move the charactedir, ColliderSize, maskr;
 
         // Mmmm Gravity
         if (!isOnGround)
         {
             if (jumpCanceled)
             {
-                velocity.y += gravity * Time.fixedDeltaTime * jumpCanceledGravityMultiplier;
+                velocity.y += gravity * Time.deltaTime * jumpCanceledGravityMultiplier;
 
             }
             else
             {
-                velocity.y += gravity * Time.fixedDeltaTime;
+                velocity.y += gravity * Time.deltaTime;
             }
         }
 
@@ -114,6 +111,30 @@ public class FlameMovementController : MonoBehaviour
         CollisionDetectionWalls();
         CollisionDetectionCeiling();
     }
+
+    // void FixedUpdate()
+    // {
+    //     transform.position += velocity * Time.fixedDeltaTime; // Move the charactedir, ColliderSize, maskr;
+
+    //     // Mmmm Gravity
+    //     if (!isOnGround)
+    //     {
+    //         if (jumpCanceled)
+    //         {
+    //             velocity.y += gravity * Time.fixedDeltaTime * jumpCanceledGravityMultiplier;
+
+    //         }
+    //         else
+    //         {
+    //             velocity.y += gravity * Time.fixedDeltaTime;
+    //         }
+    //     }
+
+    //     // Check collisions
+    //     CollisionDetectionDown(!platformDrop);
+    //     CollisionDetectionWalls();
+    //     CollisionDetectionCeiling();
+    // }
 
     private IEnumerator DropThroughPlatform()
     {
@@ -126,7 +147,7 @@ public class FlameMovementController : MonoBehaviour
     private bool GetJumpAvailability()
     {
         bool buttonDown = Input.GetButton("Jump");
-        
+
         if (jumping && !buttonDown)
         {
             jumping = false;
@@ -147,7 +168,7 @@ public class FlameMovementController : MonoBehaviour
     {
         lastRayHitResult = Physics2D.Raycast(origin, direction, diststance, mask);
         Debug.DrawRay(origin, direction, Color.red, Time.deltaTime);
-        
+
         if (lastRayHitResult.collider != null)
         {
             return true;
@@ -165,7 +186,7 @@ public class FlameMovementController : MonoBehaviour
             if (checkAll)
             {
                 Vector2 origin = new Vector2(transform.position.x, transform.position.y - colliderSizeY + rayLength);
-                collisionDetected = Raycast(origin,  -transform.up, rayLength, (wallsMask | ceilingsMask | platformsMask));
+                collisionDetected = Raycast(origin, -transform.up, rayLength, (wallsMask | ceilingsMask | platformsMask));
             }
             else
             {

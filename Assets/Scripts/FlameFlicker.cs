@@ -19,9 +19,17 @@ public class FlameFlicker : MonoBehaviour
         InvokeRepeating("UpdateOuterRadius", 0, flickerRate);
     }
 
+    void Update()
+    {
+        if (fuelHandler.GetCurrentFuelLevel() > 0)
+        {
+            flameLight.pointLightOuterRadius -= fuelHandler.secondsPerFuelUsed * 10 * Time.deltaTime;
+        }
+    }
+
     void Flicker()
     {
-        if(flickerTick)
+        if (flickerTick)
         {
             float max = flameLight.intensity * 1.20f;
             float min = flameLight.intensity * 0.80f;
@@ -37,6 +45,13 @@ public class FlameFlicker : MonoBehaviour
 
     void UpdateOuterRadius()
     {
-        flameLight.pointLightOuterRadius = fuelHandler.GetCurrentFuelLevel()/2;
+        if (fuelHandler.GetCurrentFuelLevel() > 0)
+        {
+            flameLight.pointLightOuterRadius = (fuelHandler.GetCurrentFuelLevel() / 2);
+        }
+        else
+        {
+            flameLight.pointLightOuterRadius = 0;
+        }
     }
 }
