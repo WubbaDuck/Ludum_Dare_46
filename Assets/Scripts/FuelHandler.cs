@@ -87,7 +87,7 @@ public class FuelHandler : MonoBehaviour
             }
         }
 
-        Debug.Log(fuelLevel);
+        // Debug.Log(fuelLevel);
     }
 
     private void BurnFuel()
@@ -116,7 +116,7 @@ public class FuelHandler : MonoBehaviour
     private bool Raycast(Vector2 origin, Vector2 direction, float diststance, LayerMask mask)
     {
         lastRayHitResult = Physics2D.Raycast(origin, direction, diststance, mask);
-        UnityEngine.Debug.DrawRay(origin, direction, Color.red, Time.deltaTime);
+        // UnityEngine.Debug.DrawRay(origin, direction, Color.red, Time.deltaTime);
 
         if (lastRayHitResult.collider != null)
         {

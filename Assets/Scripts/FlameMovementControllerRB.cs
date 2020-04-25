@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
-public class FlameMovementController : MonoBehaviour
+public class FlameMovementControllerRB : MonoBehaviour
 {
     public float maxMoveSpeed = 5f;
     public float maxVerticalSpeed = 25f;
@@ -16,6 +16,8 @@ public class FlameMovementController : MonoBehaviour
     public LayerMask wallsMask;
     public LayerMask ceilingsMask;
     public LayerMask platformsMask;
+
+    private Rigidbody2D rb;
 
     private float horizontalMovementRaw;
     private float verticalMovementRaw;
@@ -32,18 +34,19 @@ public class FlameMovementController : MonoBehaviour
 
     private Stopwatch stopwatch;
 
-    private float jumpButtonTimerWindow = 0.1f;
+    private float jumpButtonTimerWindow = 0.2f;
     private float isGroundedTimerWindow = 0.15f;
     private float currentJumpButtonTimer = 0f;
     private float currentIsGroundedTimer = 0f;
 
-    private Vector2 lastRayHitPoint = new Vector2();
+    private RaycastHit2D lastRayHitResult = new RaycastHit2D();
 
     private FuelHandler fuelHandler;
     private FlameAudioHandler flameAudioHandler;
 
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
         colliderSizeX = GetComponent<CapsuleCollider2D>().size.x / 2f;
         colliderSizeY = GetComponent<CapsuleCollider2D>().size.y / 2f;
         fuelHandler = GetComponent<FuelHandler>();
@@ -57,16 +60,8 @@ public class FlameMovementController : MonoBehaviour
         currentJumpButtonTimer -= Time.deltaTime;
         currentIsGroundedTimer -= Time.deltaTime;
 
-        if (fuelHandler.GetCurrentFuelLevel() > 0)
-        {
-            horizontalMovementRaw = Input.GetAxisRaw("Horizontal"); // Get the horizontal movement
-            verticalMovementRaw = Input.GetAxisRaw("Vertical"); // Get the vertial movement
-        }
-        else
-        {
-            horizontalMovementRaw = 0;
-            verticalMovementRaw = 0;
-        }
+        horizontalMovementRaw = Input.GetAxisRaw("Horizontal"); // Get the horizontal movement
+        verticalMovementRaw = Input.GetAxisRaw("Vertical"); // Get the vertial movement
 
         if (horizontalMovementRaw != 0 && !fuelHandler.IsKicking()) // Player is inputing movement commands
         {
@@ -115,7 +110,7 @@ public class FlameMovementController : MonoBehaviour
         velocity.x = Mathf.Clamp(velocity.x, -maxMoveSpeed, maxMoveSpeed);
         velocity.y = Mathf.Clamp(velocity.y, -maxVerticalSpeed, maxVerticalSpeed);
 
-        transform.position += velocity * Time.deltaTime; // Move the charactedir, ColliderSize, maskr;
+        rb.transform.position += velocity * Time.deltaTime; // Move the charactedir, ColliderSize, maskr;
 
         // Mmmm Gravity
         if (!isOnGround)
@@ -132,9 +127,10 @@ public class FlameMovementController : MonoBehaviour
         }
 
         // Check collisions
-        CollisionDetectionWalls();
-        CollisionDetectionDown(!platformDrop);
-        CollisionDetectionCeiling();
+        // CollisionDetectionWalls();
+        // CollisionDetectionDown(!platformDrop);
+        // CollisionDetectionCeiling();
+        // UnityEngine.Debug.Log(isOnGround);
     }
 
     private IEnumerator DropThroughPlatform()
@@ -180,63 +176,13 @@ public class FlameMovementController : MonoBehaviour
         return false;
     }
 
-    private bool Raycast(Vector2 origin, Vector2 direction, float distance, LayerMask mask)
+    private bool Raycast(Vector2 origin, Vector2 direction, float diststance, LayerMask mask)
     {
-        Vector2 origin1 = origin;
-        Vector2 origin2 = origin;
-        Vector2 origin3 = origin;
+        lastRayHitResult = Physics2D.Raycast(origin, direction, diststance, mask);
+        // UnityEngine.Debug.DrawRay(origin, direction, Color.red, Time.deltaTime);
 
-        RaycastHit2D ray1 = new RaycastHit2D();
-        RaycastHit2D ray2 = new RaycastHit2D();
-        RaycastHit2D ray3 = new RaycastHit2D();
-
-        if (direction.Equals(-transform.up)) // Down
+        if (lastRayHitResult.collider != null)
         {
-            UnityEngine.Debug.Log("Down");
-            origin1.x = origin1.x + (colliderSizeX / 2);
-            origin3.x = origin3.x - (colliderSizeX / 2);
-        }
-        else if (direction.Equals(transform.up)) // Up
-        {
-            UnityEngine.Debug.Log("Up");
-            origin1.x = origin1.x - (colliderSizeX / 2);
-            origin3.x = origin3.x + (colliderSizeX / 2);
-        }
-        else if (direction.Equals(transform.right)) // Right
-        {
-            UnityEngine.Debug.Log("Right");
-            origin1.y = origin1.y - (colliderSizeY / 2);
-            origin3.y = origin3.y + (colliderSizeY / 2);
-        }
-        else if (direction.Equals(-transform.right)) // Left
-        {
-            UnityEngine.Debug.Log("Left");
-            origin1.y = origin1.y + (colliderSizeY / 2);
-            origin3.y = origin3.y - (colliderSizeY / 2);
-        }
-
-        // lastRayHitPoint Physics2D.Raycast(origin1, direction, distance, mask);
-        ray1 = Physics2D.Raycast(origin1, direction, distance, mask);
-        ray2 = Physics2D.Raycast(origin2, direction, distance, mask);
-        ray3 = Physics2D.Raycast(origin3, direction, distance, mask);
-        
-        UnityEngine.Debug.DrawRay(origin1, direction, Color.red, Time.deltaTime);
-        UnityEngine.Debug.DrawRay(origin2, direction, Color.red, Time.deltaTime);
-        UnityEngine.Debug.DrawRay(origin3, direction, Color.red, Time.deltaTime);
-
-        if (ray2.collider != null)
-        {
-            lastRayHitPoint = ray2.point;
-            return true;
-        }
-        else if (ray1.collider != null)
-        {
-            lastRayHitPoint = ray1.point;
-            return true;
-        }
-        else if (ray3.collider != null)
-        {
-            lastRayHitPoint = ray3.point;
             return true;
         }
 
@@ -247,23 +193,23 @@ public class FlameMovementController : MonoBehaviour
     {
         bool collisionDetected = false;
 
-        Vector2 origin = new Vector2(transform.position.x, transform.position.y - colliderSizeY + rayLength);;
+        Vector2 origin = new Vector2(rb.transform.position.x, rb.transform.position.y - colliderSizeY + rayLength);;
 
         if (velocity.y <= 0)
         {
             if (checkAll)
             {
-                collisionDetected = Raycast(origin, -transform.up, rayLength + 0.05f, (wallsMask | ceilingsMask | platformsMask));
+                collisionDetected = Raycast(origin, -transform.up, rayLength + 0.1f, (wallsMask | ceilingsMask | platformsMask));
             }
             else
             {
-                collisionDetected = Raycast(origin, -transform.up, rayLength + 0.05f, (wallsMask | ceilingsMask));
+                collisionDetected = Raycast(origin, -transform.up, rayLength + 0.1f, (wallsMask | ceilingsMask));
             }
         }
 
         if (collisionDetected)
         {
-            transform.position = new Vector3(transform.position.x, lastRayHitPoint.y + colliderSizeY, transform.position.z);
+            rb.transform.position = new Vector3(rb.transform.position.x, lastRayHitResult.point.y + colliderSizeY, rb.transform.position.z);
             velocity.y = 0;
             isOnGround = true;
         }
@@ -280,23 +226,23 @@ public class FlameMovementController : MonoBehaviour
 
         if (velocity.x < 0) // Check left if we are moving left
         {
-            Vector2 origin = new Vector2(transform.position.x - colliderSizeX + rayLength, transform.position.y);
+            Vector2 origin = new Vector2(rb.transform.position.x - colliderSizeX + rayLength, rb.transform.position.y);
             collisionDetected = Raycast(origin, -transform.right, rayLength, (wallsMask));
 
             if (collisionDetected)
             {
-                transform.position = new Vector3(lastRayHitPoint.x + colliderSizeX, transform.position.y, transform.position.z);
+                rb.transform.position = new Vector3(lastRayHitResult.point.x + colliderSizeX, rb.transform.position.y, rb.transform.position.z);
                 velocity.x = 0;
             }
         }
         else if (velocity.x > 0) // Check right if we are moving right
         {
-            Vector2 origin = new Vector2(transform.position.x + colliderSizeX - rayLength, transform.position.y);
+            Vector2 origin = new Vector2(rb.transform.position.x + colliderSizeX - rayLength, rb.transform.position.y);
             collisionDetected = Raycast(origin, transform.right, rayLength, (wallsMask));
 
             if (collisionDetected)
             {
-                transform.position = new Vector3(lastRayHitPoint.x - colliderSizeX, transform.position.y, transform.position.z);
+                rb.transform.position = new Vector3(lastRayHitResult.point.x - colliderSizeX, rb.transform.position.y, rb.transform.position.z);
                 velocity.x = 0;
             }
         }
@@ -308,14 +254,33 @@ public class FlameMovementController : MonoBehaviour
 
         if (velocity.y >= 0)
         {
-            Vector2 origin = new Vector2(transform.position.x, transform.position.y + colliderSizeY - rayLength);
+            Vector2 origin = new Vector2(rb.transform.position.x, rb.transform.position.y + colliderSizeY - rayLength);
             collisionDetected = Raycast(origin, transform.up, rayLength, (ceilingsMask));
         }
 
         if (collisionDetected)
         {
-            transform.position = new Vector3(transform.position.x, lastRayHitPoint.y - colliderSizeY, transform.position.z);
+            rb.transform.position = new Vector3(rb.transform.position.x, lastRayHitResult.point.y - colliderSizeY, rb.transform.position.z);
             velocity.y = 0;
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.otherCollider.IsTouchingLayers(LayerMask.GetMask("Platforms", "Ceilings", "Walls")))
+        {
+            if (!platformDrop)
+            {
+                UnityEngine.Debug.Log(collision.contacts.Length);
+                rb.transform.position = new Vector3(rb.transform.position.x, collision.GetContact(0).point.y + colliderSizeY, rb.transform.position.z);
+                velocity.y = 0;
+                isOnGround = true;
+            }
+            else
+            {
+                isOnGround = false;
+                stopwatch.Start();
+            }
         }
     }
 
