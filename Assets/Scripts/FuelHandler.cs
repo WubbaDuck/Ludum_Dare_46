@@ -7,6 +7,7 @@ public class FuelHandler : MonoBehaviour
     public float secondsPerFuelUsed = 1f;
     public LayerMask fuelMask;
     public LayerMask damageMask;
+    public LayerMask wallsMask;
 
     private float fuelLevel = 15f;
     private FlameAudioHandler flameAudioHandler;
@@ -20,10 +21,11 @@ public class FuelHandler : MonoBehaviour
     private bool collisionDetectedLeft = false;
     private float colliderSizeX;
     private float rayLength = 0.3f;
-    public LayerMask wallsMask;
+    private FlameMovementController flameMovementController;
 
     void Start()
     {
+        flameMovementController = GetComponent<FlameMovementController>();
         flameAudioHandler = GetComponent<FlameAudioHandler>();
         colliderSizeX = GetComponent<CapsuleCollider2D>().size.x / 2f;
         InvokeRepeating("BurnFuel", secondsPerFuelUsed * 3f, secondsPerFuelUsed);
@@ -32,8 +34,8 @@ public class FuelHandler : MonoBehaviour
     void Update()
     {
         Vector2 origin = new Vector2(transform.position.x - colliderSizeX + rayLength, transform.position.y);
-        collisionDetectedRight = Raycast(origin, transform.right, rayLength, (wallsMask));
-        collisionDetectedLeft = Raycast(origin, -transform.right, rayLength, (wallsMask));
+        collisionDetectedRight = flameMovementController.Raycast(origin, transform.right, rayLength, (wallsMask));
+        collisionDetectedLeft = flameMovementController.Raycast(origin, -transform.right, rayLength, (wallsMask));
 
         if (!collisionDetectedLeft && !collisionDetectedRight)
         {
@@ -111,18 +113,5 @@ public class FuelHandler : MonoBehaviour
     public bool IsKicking()
     {
         return currentKickDistance != 0;
-    }
-
-    private bool Raycast(Vector2 origin, Vector2 direction, float diststance, LayerMask mask)
-    {
-        lastRayHitResult = Physics2D.Raycast(origin, direction, diststance, mask);
-        // UnityEngine.Debug.DrawRay(origin, direction, Color.red, Time.deltaTime);
-
-        if (lastRayHitResult.collider != null)
-        {
-            return true;
-        }
-
-        return false;
     }
 }

@@ -32,7 +32,7 @@ public class FlameMovementController : MonoBehaviour
 
     private Stopwatch stopwatch;
 
-    private float jumpButtonTimerWindow = 0.1f;
+    private float jumpButtonTimerWindow = 0.2f;
     private float isGroundedTimerWindow = 0.15f;
     private float currentJumpButtonTimer = 0f;
     private float currentIsGroundedTimer = 0f;
@@ -135,6 +135,11 @@ public class FlameMovementController : MonoBehaviour
         CollisionDetectionWalls();
         CollisionDetectionDown(!platformDrop);
         CollisionDetectionCeiling();
+
+        if (Input.GetKey("escape"))
+        {
+            Application.Quit();
+        }
     }
 
     private IEnumerator DropThroughPlatform()
@@ -147,13 +152,20 @@ public class FlameMovementController : MonoBehaviour
 
     private bool GetJumpAvailability()
     {
-        bool buttonDown = Input.GetButton("Jump");
+        bool buttonDown = false;
+        bool buttonHeld = false;
 
+        if (fuelHandler.GetCurrentFuelLevel() > 0)
+        {
+            buttonDown = Input.GetButtonDown("Jump");
+            buttonHeld = Input.GetButton("Jump");
+        }
         if (buttonDown)
         {
             currentJumpButtonTimer = jumpButtonTimerWindow;
         }
-        else
+
+        if (!buttonHeld)
         {
             currentJumpButtonTimer = 0;
         }
@@ -163,7 +175,7 @@ public class FlameMovementController : MonoBehaviour
             currentIsGroundedTimer = isGroundedTimerWindow;
         }
 
-        if (jumping && !(currentJumpButtonTimer > 0))
+        if (jumping && !(currentJumpButtonTimer > 0) && !buttonHeld)
         {
             jumping = false;
             jumpCanceled = true;
@@ -180,7 +192,7 @@ public class FlameMovementController : MonoBehaviour
         return false;
     }
 
-    private bool Raycast(Vector2 origin, Vector2 direction, float distance, LayerMask mask)
+    public bool Raycast(Vector2 origin, Vector2 direction, float distance, LayerMask mask)
     {
         Vector2 origin1 = origin;
         Vector2 origin2 = origin;
@@ -192,25 +204,21 @@ public class FlameMovementController : MonoBehaviour
 
         if (direction.Equals(-transform.up)) // Down
         {
-            UnityEngine.Debug.Log("Down");
             origin1.x = origin1.x + (colliderSizeX / 2);
             origin3.x = origin3.x - (colliderSizeX / 2);
         }
         else if (direction.Equals(transform.up)) // Up
         {
-            UnityEngine.Debug.Log("Up");
             origin1.x = origin1.x - (colliderSizeX / 2);
             origin3.x = origin3.x + (colliderSizeX / 2);
         }
         else if (direction.Equals(transform.right)) // Right
         {
-            UnityEngine.Debug.Log("Right");
             origin1.y = origin1.y - (colliderSizeY / 2);
             origin3.y = origin3.y + (colliderSizeY / 2);
         }
         else if (direction.Equals(-transform.right)) // Left
         {
-            UnityEngine.Debug.Log("Left");
             origin1.y = origin1.y + (colliderSizeY / 2);
             origin3.y = origin3.y - (colliderSizeY / 2);
         }
@@ -219,7 +227,7 @@ public class FlameMovementController : MonoBehaviour
         ray1 = Physics2D.Raycast(origin1, direction, distance, mask);
         ray2 = Physics2D.Raycast(origin2, direction, distance, mask);
         ray3 = Physics2D.Raycast(origin3, direction, distance, mask);
-        
+
         UnityEngine.Debug.DrawRay(origin1, direction, Color.red, Time.deltaTime);
         UnityEngine.Debug.DrawRay(origin2, direction, Color.red, Time.deltaTime);
         UnityEngine.Debug.DrawRay(origin3, direction, Color.red, Time.deltaTime);
