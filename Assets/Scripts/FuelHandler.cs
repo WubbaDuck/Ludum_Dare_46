@@ -16,7 +16,6 @@ public class FuelHandler : MonoBehaviour
     private float currentKickDistance = 0f;
     private float kickSpeed = 10f;
 
-    private RaycastHit2D lastRayHitResult = new RaycastHit2D();
     private bool collisionDetectedRight = false;
     private bool collisionDetectedLeft = false;
     private float colliderSizeX;

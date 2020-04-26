@@ -4,34 +4,45 @@ using UnityEngine;
 
 public class FlameAudioHandler : MonoBehaviour
 {
-    private AudioSource audioSource;
     public AudioClip sizzle;
     public AudioClip slosh;
     public AudioClip jump;
 
-    void Start()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
+    private AudioSource audioSource_Sizzle;
+    private AudioSource audioSource_Slosh;
+    private AudioSource audioSource_Jump;
 
     public void PlaySound_Sizzle()
     {
-        audioSource.Stop();
-        audioSource.clip = sizzle;
-        audioSource.Play();
+        audioSource_Sizzle = gameObject.AddComponent<AudioSource>();
+        audioSource_Sizzle.clip = sizzle;
+        audioSource_Sizzle.Play();
+        StartCoroutine(PlaySound(audioSource_Sizzle));
     }
 
     public void PlaySound_Slosh()
     {
-        audioSource.Stop();
-        audioSource.clip = slosh;
-        audioSource.Play();
+        audioSource_Slosh = gameObject.AddComponent<AudioSource>();
+        audioSource_Slosh.clip = slosh;
+        audioSource_Slosh.Play();
+        StartCoroutine(PlaySound(audioSource_Slosh));
     }
 
     public void PlaySound_Jump()
     {
-        audioSource.Stop();
-        audioSource.clip = jump;
-        audioSource.Play();
+        audioSource_Jump = gameObject.AddComponent<AudioSource>();
+        audioSource_Jump.clip = jump;
+        audioSource_Jump.Play();
+        StartCoroutine(PlaySound(audioSource_Jump));
+    }
+
+    private IEnumerator PlaySound(AudioSource source)
+    {
+        while(source.isPlaying)
+        {
+            yield return new WaitForSeconds(0.1f);
+        };
+
+        Destroy(source);
     }
 }
